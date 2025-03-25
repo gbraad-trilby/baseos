@@ -1,0 +1,39 @@
+name: build containers
+run-name: building containers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build-containers
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Run podman build - base
+        run: |
+          podman build -t ghcr.io/gbraad-trilby/base:41 \
+            --build-arg=BASE_IMAGE="quay.io/fedora/fedora" \
+            --build-arg=BASE_VERSION=41 \
+            -f containers/Containerfile-base .
+
+      - name: Login to ghcr.io
+        run: |
+          podman login ghcr.io -u ${{ github.actor }} \
+            -p ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to ghcr.io - base
+        run: |
+          podman push ghcr.io/gbraad-trilby/base:41
+
