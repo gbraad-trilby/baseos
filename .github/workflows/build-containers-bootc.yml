@@ -21,11 +21,17 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
+      - name: Fetch shared configuration
+        uses: gbraad-actions/shared-config@v1
+        with:
+          config_repo: https://github.com/gbraad/shared-config.git
+          config_file: ${{ github.repository }}/config.ini
+
       - name: Run podman build - base-bootc
         run: |
           podman build -t ghcr.io/gbraad-trilby/base-bootc:41 \
-            --build-arg=BASE_IMAGE="quay.io/fedora/fedora-bootc" \
-            --build-arg=BASE_VERSION=41 \
+            --build-arg=BASE_IMAGE=${{ env.BOOTC_IMAGE }} \
+            --build-arg=${{ env.BASE_VERSION }} \
             -f containers/Containerfile-base .
 
       - name: Login to ghcr.io
