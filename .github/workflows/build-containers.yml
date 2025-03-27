@@ -25,13 +25,13 @@ jobs:
         uses: gbraad-actions/shared-config@v1
         with:
           config_repo: https://github.com/gbraad/shared-config.git
-          config_file: fedora.ini
+          config_file: ${{ github.repository }}/config.ini
 
       - name: Run podman build - base
         run: |
           podman build -t ghcr.io/gbraad-trilby/base:41 \
-            --build-arg=BASE_IMAGE="quay.io/fedora/fedora" \
-            --build-arg=BASE_VERSION=41 \
+            --build-arg=BASE_IMAGE=${{ env.BASE_IMAGE }} \
+            --build-arg=${{ env.BASE_VERSION }} \
             -f containers/Containerfile-base .
 
       - name: Login to ghcr.io
